@@ -102,24 +102,24 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen>
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: const Color(0xFFF43F5E),
-        unselectedItemColor: Colors.grey,
-        currentIndex: 2,
-        items: const [
-          BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined), label: 'Home'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.shopping_bag_outlined), label: 'Shop'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.receipt_long), label: 'Orders'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.favorite_border), label: 'Wishlist'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline), label: 'Profile'),
-        ],
-      ),
+      // bottomNavigationBar: BottomNavigationBar(
+      //   type: BottomNavigationBarType.fixed,
+      //   selectedItemColor: const Color(0xFFF43F5E),
+      //   unselectedItemColor: Colors.grey,
+      //   currentIndex: 2,
+      //   items: const [
+      //     BottomNavigationBarItem(
+      //         icon: Icon(Icons.home_outlined), label: 'Home'),
+      //     BottomNavigationBarItem(
+      //         icon: Icon(Icons.shopping_bag_outlined), label: 'Shop'),
+      //     BottomNavigationBarItem(
+      //         icon: Icon(Icons.receipt_long), label: 'Orders'),
+      //     BottomNavigationBarItem(
+      //         icon: Icon(Icons.favorite_border), label: 'Wishlist'),
+      //     BottomNavigationBarItem(
+      //         icon: Icon(Icons.person_outline), label: 'Profile'),
+      //   ],
+      // ),
     );
   }
 

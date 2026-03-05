@@ -410,7 +410,8 @@ class _ManageOrdersScreenState extends State<ManageOrdersScreen> {
                                             fontSize: 16),
                                       ),
                                       Text(
-                                        "\$${data['price']?.toStringAsFixed(2) ?? '0.00'}",
+                                        // "\$${data['price']?.toStringAsFixed(2) ?? '0.00'}",
+                                          "\$${(data['price'] ?? 0).toDouble().toStringAsFixed(2)}",
                                         style: const TextStyle(
                                           color: Color(0xFFEE2B5B),
                                           fontWeight: FontWeight.bold,

@@ -8,13 +8,15 @@ class AdminOrderStatusScreen extends StatefulWidget {
   final String price;
   final String status;
   final String imageUrl;
+  final String orderNumber;
   const AdminOrderStatusScreen(
       {super.key,
       required this.orderId,
       required this.customerName,
       required this.price,
       required this.status,
-      required this.imageUrl});
+      required this.imageUrl,
+      required this.orderNumber});
 
   @override
   State<AdminOrderStatusScreen> createState() => _AdminOrderStatusScreenState();
@@ -25,36 +27,138 @@ class _AdminOrderStatusScreenState extends State<AdminOrderStatusScreen> {
   // List<String> completedStatuses = ['Packed'];
   late String currentStatus;
   late List<String> completedStatuses;
-@override
-void initState() {
-  super.initState();
+  @override
+  void initState() {
+    super.initState();
 
-  currentStatus = widget.status;
-  completedStatuses = [widget.status];
-}
-  void _updateStatus(String status) {
-    setState(() {
-      currentStatus = status;
-      if (!completedStatuses.contains(status)) {
-        completedStatuses.add(status);
-      }
-    });
+    currentStatus = widget.status;
+    completedStatuses = [widget.status];
+
+    _loadOrderStatus(); // 🔥 fetch latest status from Firestore
   }
 
-  Future<void> _saveStatusToFirestore() async {
-    await FirebaseFirestore.instance
+  // void _updateStatus(String status) {
+  //   setState(() {
+  //     currentStatus = status;
+  //     if (!completedStatuses.contains(status)) {
+  //       completedStatuses.add(status);
+  //     }
+  //   });
+  // }
+  void _confirmStatusUpdate(String status) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Text(
+            "Confirm Status Update",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: Text(
+            "Are you sure you want to update order status to \"$status\"?",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+              },
+              child: const Text("No"),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFEE2B5B),
+              ),
+              onPressed: () async {
+                /// Save messenger before pop
+                final messenger = ScaffoldMessenger.of(context);
+
+                Navigator.pop(dialogContext);
+
+                int index = statusFlow.indexOf(status);
+
+                /// 🔥 Prevent skipping status
+                int currentIndex = statusFlow.indexOf(currentStatus);
+
+                if (index > currentIndex + 1) {
+                  messenger.showSnackBar(
+                    const SnackBar(
+                      content: Text("Please complete previous status first"),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                } 
+
+                /// Update UI
+                setState(() {
+                  currentStatus = status;
+                  completedStatuses = statusFlow.sublist(0, index + 1);
+                });
+
+                final Map<String, String> statusFieldMap = {
+                  "Packed": "packedAt",
+                  "Shipped": "shippedAt",
+                  "Out for Delivery": "outForDeliveryAt",
+                  "Delivered": "deliveredAt",
+                };
+
+                String? fieldName = statusFieldMap[status];
+
+                /// 🔥 Update Firebase
+                await FirebaseFirestore.instance
+                    .collection('orders')
+                    .doc(widget.orderId)
+                    .update({
+                  'status': status,
+                  // '${status.toLowerCase().replaceAll(" ", "")}At':
+                  //     FieldValue.serverTimestamp(),
+                  if (fieldName != null)
+                    fieldName: FieldValue.serverTimestamp(),
+                });
+
+                /// Show snackbar
+                messenger.showSnackBar(
+                  SnackBar(
+                    content: Text("$status updated successfully"),
+                    backgroundColor: const Color(0xFFEE2B5B),
+                  ),
+                );
+              },
+              child: const Text("Yes"),
+            )
+          ],
+        );
+      },
+    );
+  }
+
+  final List<String> statusFlow = [
+    'Packed',
+    'Shipped',
+    'Out for Delivery',
+    'Delivered'
+  ];
+
+  Future<void> _loadOrderStatus() async {
+    final doc = await FirebaseFirestore.instance
         .collection('orders')
         .doc(widget.orderId)
-        .update({
-      'status': currentStatus,
-    });
+        .get();
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Order status updated successfully'),
-        backgroundColor: Color(0xFFEE2B5B),
-      ),
-    );
+    if (doc.exists) {
+      final data = doc.data();
+      String status = data?['status'] ?? widget.status;
+
+      int index = statusFlow.indexOf(status);
+
+      setState(() {
+        currentStatus = status;
+        completedStatuses = statusFlow.sublist(0, index + 1);
+      });
+    }
   }
 
   @override
@@ -64,17 +168,6 @@ void initState() {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        // leading: Padding(
-        //   padding: const EdgeInsets.all(8.0),
-        //   child: CircleAvatar(
-        //     backgroundColor: Colors.white,
-        //     child: IconButton(
-        //       icon: const Icon(Icons.arrow_back_ios_new,
-        //           size: 18, color: Colors.black),
-        //       onPressed: () {},
-        //     ),
-        //   ),
-        // ),
         title: Text(
           'Update Order Status',
           style: GoogleFonts.poppins(
@@ -111,7 +204,7 @@ void initState() {
           ],
         ),
       ),
-      bottomSheet: _buildFooter(),
+      // bottomSheet: _buildFooter(),
     );
   }
 
@@ -140,7 +233,9 @@ void initState() {
                 children: [
                   Text(
                     // 'ORDER #TD-8829',
-                    'ORDER #${widget.orderId}',
+                    // 'ORDER #${widget.orderId}',
+                    'ORDER #${widget.orderNumber}',
+
                     style: const TextStyle(
                       color: Color(0xFFEE2B5B),
                       fontWeight: FontWeight.bold,
@@ -172,7 +267,8 @@ void initState() {
                 ),
                 child: Text(
                   // 'PROCESSING',
-                  widget.status.toUpperCase(),
+                  // widget.status.toUpperCase(),
+                  currentStatus.toUpperCase(),
                   style: const TextStyle(
                     color: Color(0xFFEE2B5B),
                     fontWeight: FontWeight.bold,
@@ -267,7 +363,9 @@ void initState() {
     bool isCompleted = completedStatuses.contains(label);
 
     return GestureDetector(
-      onTap: () => _updateStatus(label),
+      // onTap: () => _updateStatus(label),
+      onTap: () => _confirmStatusUpdate(label),
+
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -449,60 +547,6 @@ void initState() {
                 color: Colors.grey, fontWeight: FontWeight.w500)),
         Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
       ],
-    );
-  }
-
-  Widget _buildFooter() {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.9),
-        border: const Border(top: BorderSide(color: Color(0xFFF8F9FB))),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: OutlinedButton(
-              onPressed: () {},
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16)),
-                side: const BorderSide(color: Color(0xFFE0E0E0)),
-              ),
-              child: const Text('Cancel',
-                  style: TextStyle(
-                      color: Colors.grey, fontWeight: FontWeight.bold)),
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            flex: 2,
-            child: ElevatedButton(
-              // onPressed: () {},
-              onPressed: _saveStatusToFirestore,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFEE2B5B),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16)),
-                elevation: 4,
-                shadowColor: const Color(0xFFEE2B5B).withOpacity(0.4),
-              ),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Update Status',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  SizedBox(width: 8),
-                  Icon(Icons.arrow_forward, size: 18),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

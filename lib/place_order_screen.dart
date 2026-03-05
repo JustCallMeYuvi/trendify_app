@@ -34,7 +34,8 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
         centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        // padding: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.fromLTRB(20, 0, 20, 120),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -206,10 +207,11 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
               Icons.credit_card_outlined,
               primaryColor,
             ),
-            const SizedBox(height: 140), // Space for bottom bar
+      SizedBox(height: MediaQuery.of(context).size.height * 0.1),// Space for bottom bar
           ],
         ),
       ),
+      
       bottomSheet: Container(
         padding: const EdgeInsets.fromLTRB(24, 20, 24, 40),
         decoration: BoxDecoration(
@@ -326,7 +328,6 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
         );
         return;
       }
-      
 
       final addressData = addressSnapshot.docs.first.data();
 
@@ -350,38 +351,55 @@ class _PlaceOrderScreenState extends State<PlaceOrderScreen> {
       // });
 
       // 🔥 Generate custom order number
-final orderNumber =
-    "#TR-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}";
+      final orderNumber =
+          "TR-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}";
 
-// 🔥 Get customer name from users collection
-final userDoc = await FirebaseFirestore.instance
-    .collection('users')
-    .doc(user.uid)
-    .get();
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
 
-final userData = userDoc.data();
+      final userData = userDoc.data();
 
-final orderRef =
-    await FirebaseFirestore.instance.collection('orders').add({
-  'orderNumber': orderNumber,
-  'userId': user.uid,
-  // 'customerName': userData?['name'] ?? "Customer",
-  'customerName': userData?['fullName'] ?? "Customer",
+      final orderRef =
+          await FirebaseFirestore.instance.collection('orders').add({
+        "orderNumber": orderNumber,
+        "userId": user.uid,
 
-  'productId': widget.product.id,
-  'productName': widget.product.name,
-  'price': widget.product.price,
-  'paymentMethod': _selectedPayment,
-  'status': 'Pending',
+        /// Customer Info
+        "customerName": userData?['fullName'] ?? "Customer",
 
-  'imageUrl': widget.product.imageUrls.isNotEmpty
-      ? widget.product.imageUrls.first
-      : null,
+        /// Product Info
+        "productId": widget.product.id,
+        "productName": widget.product.name,
+        "productImage": widget.product.imageUrls.isNotEmpty
+            ? widget.product.imageUrls.first
+            : "",
 
-  'address': addressData,
-  'createdAt': Timestamp.now(),
-});
+        /// Payment
+        "paymentMethod": _selectedPayment,
 
+        /// Order Status
+        "status": "Pending",
+
+        /// Price
+        "price": widget.product.price,
+
+        /// Address
+        "address": {
+          "house": addressData['house'],
+          "area": addressData['area'],
+          "city": addressData['city'],
+          "pincode": addressData['pincode'],
+        },
+
+        /// Time
+        "createdAt": FieldValue.serverTimestamp(),
+
+          /// 🔥 ADD THIS (Expected Delivery after 5 days)
+  "expectedDelivery":
+      Timestamp.fromDate(DateTime.now().add(const Duration(days: 5))),
+      });
       // 🔥 3️⃣ Navigate to Success Screen
       Navigator.pushReplacement(
         context,
@@ -399,7 +417,7 @@ final orderRef =
         SnackBar(content: Text("Order failed: $e")),
       );
     } finally {
-      setState(() => _isPlacingOrder = true);
+      setState(() => _isPlacingOrder = false);
     }
   }
 

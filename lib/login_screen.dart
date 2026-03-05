@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:trendify/admin_insights_dashboard_screen.dart';
 import 'package:trendify/customer_explore_trends_screen.dart';
 import 'package:trendify/signup_screen.dart';
@@ -332,6 +333,15 @@ class _LoginScreenState extends State<LoginScreen> {
           await FirebaseFirestore.instance.collection('users').doc(uid).get();
 
       String role = userDoc['role'];
+
+ /// 🔥 Store login credentials locally
+      SharedPreferences prefs =
+          await SharedPreferences.getInstance();
+
+      await prefs.setBool("isLoggedIn", true);
+      await prefs.setString("role", role);
+      await prefs.setString("email", _emailController.text.trim());
+      await prefs.setString("uid", uid);
 
       if (role == 'admin') {
         Navigator.pushReplacement(
