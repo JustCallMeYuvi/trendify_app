@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:trendify/customer/main_customer_bottom_nav_bar.dart';
 import 'package:trendify/customer_explore_trends_screen.dart';
 import 'package:trendify/order_item_widget.dart';
 
@@ -254,7 +255,8 @@ class OrderSuccessScreen extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                 builder: (_) =>
-                                    const CustomerExploreTrendsScreen(),
+                                    // const CustomerExploreTrendsScreen(),
+                                    const CustomerMainNavigationScreen(),
                               ),
                             );
                           },

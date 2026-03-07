@@ -157,6 +157,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 class CreateAccountScreen extends StatefulWidget {
@@ -215,29 +216,28 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
 
       String uid = userCredential.user!.uid;
 
-       /// 🔥 1️⃣ Save User Basic Info
-    await FirebaseFirestore.instance.collection('users').doc(uid).set({
-      'fullName': fullNameController.text.trim(),
-      'email': emailController.text.trim(),
-      'phone': phoneController.text.trim(),
-      'role': "customer",
-      'createdAt': Timestamp.now(),
-    });
+      /// 🔥 1️⃣ Save User Basic Info
+      await FirebaseFirestore.instance.collection('users').doc(uid).set({
+        'fullName': fullNameController.text.trim(),
+        'email': emailController.text.trim(),
+        'phone': phoneController.text.trim(),
+        'role': "customer",
+        'createdAt': Timestamp.now(),
+      });
 
-    /// 🔥 2️⃣ SAVE ADDRESS SUBCOLLECTION
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(uid)
-        .collection('addresses')
-        .add({
-      'house': houseController.text.trim(),
-      'area': areaController.text.trim(),
-      'city': cityController.text.trim(),
-      'pincode': pinController.text.trim(),
-      'isDefault': true,
-      'createdAt': Timestamp.now(),
-    });
-
+      /// 🔥 2️⃣ SAVE ADDRESS SUBCOLLECTION
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .collection('addresses')
+          .add({
+        'house': houseController.text.trim(),
+        'area': areaController.text.trim(),
+        'city': cityController.text.trim(),
+        'pincode': pinController.text.trim(),
+        'isDefault': true,
+        'createdAt': Timestamp.now(),
+      });
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Account Created Successfully 🎉")),
@@ -288,7 +288,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Form(
-             key: _formKey,
+          key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -312,7 +312,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                 ),
               ),
               const SizedBox(height: 40),
-          
+
               // Profile Photo Section
               Center(
                 child: Stack(
@@ -360,14 +360,14 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                             )
                           ],
                         ),
-                        child:
-                            const Icon(Icons.add, color: Colors.white, size: 20),
+                        child: const Icon(Icons.add,
+                            color: Colors.white, size: 20),
                       ),
                     ),
                   ],
                 ),
               ),
-          
+
               const SizedBox(height: 40),
               _buildSectionHeader('Personal Information'),
               const SizedBox(height: 24),
@@ -386,7 +386,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                   hint: '+1 234 567 890',
                   icon: Icons.phone_outlined,
                   controller: phoneController),
-            
+
               _buildTextField(
                 controller: passwordController,
                 label: "Password",
@@ -399,7 +399,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                   });
                 },
               ),
-          
+
               _buildTextField(
                 controller: confirmPasswordController,
                 label: "Confirm Password",
@@ -420,13 +420,13 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                 label: 'House No / Flat',
                 hint: 'Apartment 4B',
               ),
-          
+
               _buildTextField(
                 controller: areaController,
                 label: 'Area / Street',
                 hint: 'Sunset Boulevard',
               ),
-          
+
               Row(
                 children: [
                   Expanded(
@@ -446,9 +446,9 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                   ),
                 ],
               ),
-          
+
               const SizedBox(height: 30),
-          
+
               // Create Account Button
               Container(
                 width: double.infinity,
@@ -464,7 +464,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                   ],
                 ),
                 child: ElevatedButton(
-             onPressed: _signup,
+                  onPressed: _signup,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFF43F5E),
                     foregroundColor: Colors.white,
@@ -477,8 +477,8 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     children: [
                       Text(
                         'Create Account',
-                        style:
-                            TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w800),
                       ),
                       SizedBox(width: 12),
                       Icon(Icons.arrow_forward, size: 22),
@@ -486,28 +486,34 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                   ),
                 ),
               ),
-          
+
               const SizedBox(height: 32),
               Center(
                 child: RichText(
-                  text: const TextSpan(
+                  text: TextSpan(
                     text: 'Already have an account? ',
-                    style: TextStyle(
-                        color: Colors.grey,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500),
+                    style: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
                     children: [
                       TextSpan(
                         text: 'Login',
-                        style: TextStyle(
-                            color: Color(0xFFF43F5E),
-                            fontWeight: FontWeight.w800),
+                        style: const TextStyle(
+                          color: Color(0xFFF43F5E),
+                          fontWeight: FontWeight.w800,
+                        ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            Navigator.pop(context); // navigate back
+                          },
                       ),
                     ],
                   ),
                 ),
               ),
-          
+
               const SizedBox(height: 48),
               Row(
                 children: [

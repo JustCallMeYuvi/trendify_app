@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:trendify/admin_insights_dashboard_screen.dart';
-import 'package:trendify/admin_order_management_screen.dart';
+import 'package:trendify/admin/admin_insights_dashboard_screen.dart';
+import 'package:trendify/admin/admin_order_management_screen.dart';
 import 'package:trendify/admin/admin_settings_screen.dart';
 
 class AdminMainScreen extends StatefulWidget {
@@ -16,8 +16,8 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
 
   final List<Widget> _pages = [
     const AdminDashboardScreen(),
+    const AdminDashboardScreen(),
     const ManageOrdersScreen(),
-    const AdminSettingsPage(), // Inventory screen
     const AdminSettingsPage(),
   ];
 

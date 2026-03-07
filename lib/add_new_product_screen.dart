@@ -150,10 +150,6 @@ class _AddNewProductScreenState extends State<AddNewProductScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.chevron_left, size: 30),
-          onPressed: () {},
-        ),
         title: const Text(
           'Add New Product',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
@@ -231,54 +227,6 @@ class _AddNewProductScreenState extends State<AddNewProductScreen> {
     );
   }
 
-  // Widget _buildImagePicker() {
-  //   return SizedBox(
-  //     height: 180,
-  //     child: ListView(
-  //       scrollDirection: Axis.horizontal,
-  //       children: [
-  //         // Add Photo Button
-  //         Container(
-  //           width: 130,
-  //           decoration: BoxDecoration(
-  //             color: const Color(0xFFFFF1F2),
-  //             borderRadius: BorderRadius.circular(24),
-  //             border: Border.all(
-  //                 color: const Color(0xFFFECDD3),
-  //                 width: 2,
-  //                 style: BorderStyle.solid),
-  //           ),
-  //           child: Column(
-  //             mainAxisAlignment: MainAxisAlignment.center,
-  //             children: [
-  //               Container(
-  //                 padding: const EdgeInsets.all(12),
-  //                 decoration: BoxDecoration(
-  //                     color: _primaryColor, shape: BoxShape.circle),
-  //                 child: const Icon(Icons.camera_alt,
-  //                     color: Colors.white, size: 24),
-  //               ),
-  //               const SizedBox(height: 8),
-  //               Text('Add Photo',
-  //                   style: TextStyle(
-  //                       color: _primaryColor,
-  //                       fontWeight: FontWeight.bold,
-  //                       fontSize: 12)),
-  //             ],
-  //           ),
-  //         ),
-  //         const SizedBox(width: 12),
-  //         // Mock Image 1
-  //         _buildImagePreview(
-  //             'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400'),
-  //         const SizedBox(width: 12),
-  //         // Mock Image 2
-  //         _buildImagePreview(
-  //             'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400'),
-  //       ],
-  //     ),
-  //   );
-  // }
   Widget _buildImagePicker() {
     return SizedBox(
       height: 180,

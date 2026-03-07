@@ -12,8 +12,16 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+    final user = FirebaseAuth.instance.currentUser;
   @override
   Widget build(BuildContext context) {
+
+    /// 🔴 If user not logged in
+    if (user == null) {
+      return const Scaffold(
+        body: Center(child: Text("User not logged in")),
+      );
+    }
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white.withOpacity(0.8),
@@ -35,162 +43,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ],
       ),
-      // body: SingleChildScrollView(
-      //   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-      //   child: Column(
-      //     children: [
-      //       // Profile Hero
-      //       Center(
-      //         child: Stack(
-      //           children: [
-      //             Container(
-      //               decoration: BoxDecoration(
-      //                 shape: BoxShape.circle,
-      //                 border: Border.all(color: Colors.white, width: 4),
-      //                 boxShadow: [
-      //                   BoxShadow(
-      //                     color: Colors.black.withOpacity(0.1),
-      //                     blurRadius: 20,
-      //                     offset: const Offset(0, 10),
-      //                   ),
-      //                 ],
-      //               ),
-      //               child: const CircleAvatar(
-      //                 radius: 60,
-      //                 backgroundImage: NetworkImage(
-      //                   'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=256',
-      //                 ),
-      //               ),
-      //             ),
-      //             Positioned(
-      //               bottom: 5,
-      //               right: 5,
-      //               child: Container(
-      //                 padding: const EdgeInsets.all(6),
-      //                 decoration: BoxDecoration(
-      //                   color: const Color(0xFFEE2B5B),
-      //                   shape: BoxShape.circle,
-      //                   border: Border.all(color: Colors.white, width: 2),
-      //                 ),
-      //                 child:
-      //                     const Icon(Icons.edit, color: Colors.white, size: 16),
-      //               ),
-      //             ),
-      //           ],
-      //         ),
-      //       ),
-      //       const SizedBox(height: 16),
-      //       const Text(
-      //         'Alexandra Vane',
-      //         style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-      //       ),
-      //       const Text(
-      //         'alexandra.vane@trendify.com',
-      //         style: TextStyle(
-      //             color: Colors.grey,
-      //             fontSize: 14,
-      //             fontWeight: FontWeight.w500),
-      //       ),
-      //       const SizedBox(height: 32),
-
-      //       // Personal Information Card
-      //       _buildInfoCard(
-      //         icon: Icons.person_outline,
-      //         title: 'Personal Information',
-      //         children: [
-      //           _buildInfoRow('Full Name', 'Alexandra Vane'),
-      //           _buildInfoRow('Phone', '+1 (555) 892-4412'),
-      //           _buildInfoRow('Email', 'alexandra.vane@trendify.com'),
-      //         ],
-      //       ),
-      //       const SizedBox(height: 16),
-
-      //       // Shipping Address Card
-      //       _buildInfoCard(
-      //         icon: Icons.local_shipping_outlined,
-      //         title: 'Primary Shipping Address',
-      //         trailing: Container(
-      //           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      //           decoration: BoxDecoration(
-      //             color: const Color(0xFFEE2B5B).withOpacity(0.1),
-      //             borderRadius: BorderRadius.circular(20),
-      //           ),
-      //           child: const Text(
-      //             'HOME',
-      //             style: TextStyle(
-      //                 color: Color(0xFFEE2B5B),
-      //                 fontSize: 10,
-      //                 fontWeight: FontWeight.bold),
-      //           ),
-      //         ),
-      //         child: Row(
-      //           children: [
-      //             ClipRRect(
-      //               borderRadius: BorderRadius.circular(12),
-      //               child: Image.network(
-      //                 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=200',
-      //                 width: 80,
-      //                 height: 80,
-      //                 fit: BoxFit.cover,
-      //               ),
-      //             ),
-      //             const SizedBox(width: 16),
-      //             const Column(
-      //               crossAxisAlignment: CrossAxisAlignment.start,
-      //               children: [
-      //                 Text('4521 Riverside Avenue',
-      //                     style: TextStyle(
-      //                         fontWeight: FontWeight.bold, fontSize: 14)),
-      //                 Text('Apartment 4B, Upper West Side',
-      //                     style: TextStyle(color: Colors.grey, fontSize: 12)),
-      //                 Text('New York, NY 10024',
-      //                     style: TextStyle(color: Colors.grey, fontSize: 12)),
-      //               ],
-      //             ),
-      //           ],
-      //         ),
-      //       ),
-      //       const SizedBox(height: 16),
-
-      //       // Account Role Card
-      //       _buildActionCard(
-      //         icon: Icons.verified_user_outlined,
-      //         title: 'Account Role',
-      //         value: 'Customer',
-      //       ),
-      //       const SizedBox(height: 24),
-
-      //       // Quick Links
-      //       _buildQuickLink(Icons.history, 'Order History'),
-      //       _buildQuickLink(Icons.map_outlined, 'My Saved Addresses'),
-      //       const SizedBox(height: 24),
-
-      //       // Logout Button
-      //       SizedBox(
-      //         width: double.infinity,
-      //         child: TextButton.icon(
-      //           onPressed: () {},
-      //           icon: const Icon(Icons.logout, color: Color(0xFFEE2B5B)),
-      //           label: const Text('Logout',
-      //               style: TextStyle(
-      //                   color: Color(0xFFEE2B5B), fontWeight: FontWeight.bold)),
-      //           style: TextButton.styleFrom(
-      //             backgroundColor: const Color(0xFFEE2B5B).withOpacity(0.1),
-      //             padding: const EdgeInsets.symmetric(vertical: 16),
-      //             shape: RoundedRectangleBorder(
-      //                 borderRadius: BorderRadius.circular(16)),
-      //           ),
-      //         ),
-      //       ),
-      //       const SizedBox(height: 80), // Space for bottom nav
-      //     ],
-      //   ),
-      // ),
 
       body: StreamBuilder<DocumentSnapshot>(
         stream: FirebaseFirestore.instance
             .collection('users')
-            .doc(FirebaseAuth.instance.currentUser!.uid)
+            // .doc(FirebaseAuth.instance.currentUser!.uid)
+            .doc(user!.uid)
             .snapshots(),
         builder: (context, userSnapshot) {
           if (userSnapshot.connectionState == ConnectionState.waiting) {

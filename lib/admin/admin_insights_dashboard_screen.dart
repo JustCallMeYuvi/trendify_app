@@ -2,12 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:trendify/add_new_product_screen.dart';
-import 'package:trendify/admin/admin_settings_screen.dart';
-import 'package:trendify/admin_manage_order_irem_widget.dart';
-import 'package:trendify/admin_order_management_screen.dart';
-import 'package:trendify/admin_order_tracking_screen.dart';
-import 'package:trendify/admin_performance_chart_screen.dart';
+
+import 'package:trendify/admin/admin_manage_order_irem_widget.dart';
+
+import 'package:trendify/admin/admin_performance_chart_screen.dart';
 import 'package:trendify/app_colors.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
@@ -247,36 +245,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               ],
             ),
             const SizedBox(height: 8),
-            // const OrderItem(
-            //   id: '#TR-8942',
-            //   name: 'Premium Denim Jacket',
-            //   time: '2 mins ago',
-            //   price: '\$89.00',
-            //   status: 'Processing',
-            //   imageUrl:
-            //       'https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?q=80&w=200&auto=format&fit=crop',
-            // ),
-            // const SizedBox(height: 12),
-            // const OrderItem(
-            //   id: '#TR-8941',
-            //   name: 'Floral Silk Maxi Dress',
-            //   time: '15 mins ago',
-            //   price: '\$124.50',
-            //   status: 'Shipped',
-            //   imageUrl:
-            //       'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?q=80&w=200&auto=format&fit=crop',
-            // ),
-            // const SizedBox(height: 12),
-            // const OrderItem(
-            //   id: '#TR-8940',
-            //   name: 'Slim-Fit Wool Suit',
-            //   time: '1 hr ago',
-            //   price: '\$450.00',
-            //   status: 'Pending',
-            //   imageUrl:
-            //       'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?q=80&w=200&auto=format&fit=crop',
-            // ),
-
             Column(
               children: recentOrders.map((order) {
                 return Padding(
@@ -290,8 +258,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     time: _formatTime(order['createdAt']),
                     price: "\$${order['price']}",
                     status: order['status'] ?? 'Pending',
+                    // imageUrl:
+                    //     "https://picsum.photos/200", // Replace with product image if stored
                     imageUrl:
-                        "https://picsum.photos/200", // Replace with product image if stored
+                        order['productImage'] ?? "https://picsum.photos/200",
                   ),
                 );
               }).toList(),
@@ -300,102 +270,63 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           ],
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: Container(
-        margin: const EdgeInsets.only(top: 30),
-        height: 64,
-        width: 64,
-        child: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const AddNewProductScreen(),
-              ),
-            );
-          },
-          backgroundColor: const Color(0xFFEE2B5B),
-          elevation: 8,
-          shape: const CircleBorder(
-            side: BorderSide(color: Color(0xFFF8F6F6), width: 4),
-          ),
-          child: const Icon(Icons.add, color: Colors.white, size: 32),
-        ),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        color: Colors.white,
-        elevation: 10,
-        height: 80,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildNavItem(0, Icons.dashboard_outlined, 'Dashboard'),
-            _buildNavItem(1, Icons.bar_chart_outlined, 'Analytics'),
-            const SizedBox(width: 40),
-            // _buildNavItem(2, Icons.inventory_2_outlined, 'Inventory'),
-            _buildNavItem(2, Icons.inventory_2_outlined, 'Orders'),
-
-            _buildNavItem(3, Icons.settings_outlined, 'Settings'),
-          ],
-        ),
-      ),
     );
   }
 
-  Widget _buildNavItem(int index, IconData icon, String label) {
-    final isSelected = _selectedIndex == index;
-    return GestureDetector(
-      // onTap: () => setState(() => _selectedIndex = index),
-      onTap: () {
-        setState(() => _selectedIndex = index);
+  // Widget _buildNavItem(int index, IconData icon, String label) {
+  //   final isSelected = _selectedIndex == index;
+  //   return GestureDetector(
+  //     // onTap: () => setState(() => _selectedIndex = index),
+  //     onTap: () {
+  //       setState(() => _selectedIndex = index);
 
-        if (index == 2) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const ManageOrdersScreen(),
-            ),
-          );
-        }
-        if (index == 1) {
-          // // Analytics Clicked
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (context) => const AdminPerformanceChartScreen(),
-          //   ),
-          // );
-        }
+  //       if (index == 2) {
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(
+  //             builder: (context) => const ManageOrdersScreen(),
+  //           ),
+  //         );
+  //       }
+  //       if (index == 1) {
+  //         // // Analytics Clicked
+  //         // Navigator.push(
+  //         //   context,
+  //         //   MaterialPageRoute(
+  //         //     builder: (context) => const AdminPerformanceChartScreen(),
+  //         //   ),
+  //         // );
+  //       }
 
-        if (index == 3) {
-          // // Settings Clicked
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const AdminSettingsPage(),
-            ),
-          );
-        }
-      },
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            color: isSelected ? const Color(0xFFEE2B5B) : Colors.grey[400],
-          ),
-          Text(
-            label,
-            style: GoogleFonts.inter(
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-              color: isSelected ? const Color(0xFFEE2B5B) : Colors.grey[400],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  //       if (index == 3) {
+  //         // // Settings Clicked
+  //         Navigator.push(
+  //           context,
+  //           MaterialPageRoute(
+  //             builder: (context) => const AdminSettingsPage(),
+  //           ),
+  //         );
+  //       }
+  //     },
+  //     child: Column(
+  //       mainAxisSize: MainAxisSize.min,
+  //       children: [
+  //         Icon(
+  //           icon,
+  //           color: isSelected ? const Color(0xFFEE2B5B) : Colors.grey[400],
+  //         ),
+  //         Text(
+  //           label,
+  //           style: GoogleFonts.inter(
+  //             fontSize: 10,
+  //             fontWeight: FontWeight.bold,
+  //             color: isSelected ? const Color(0xFFEE2B5B) : Colors.grey[400],
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 }
 
 class StatCard extends StatelessWidget {
@@ -482,7 +413,6 @@ class StatCard extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-         
             const SizedBox(height: 16),
             SizedBox(
               height: 40,

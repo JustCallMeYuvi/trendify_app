@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:trendify/customer/product_card_widget.dart';
 import 'package:trendify/customer_explore_trends_screen.dart';
 import 'package:trendify/place_order_screen.dart';
 
@@ -398,14 +399,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               flex: 2,
               child: ElevatedButton(
                 onPressed: () {
-                    Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => PlaceOrderScreen(
-        product: widget.product,
-      ),
-    ),
-  );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => PlaceOrderScreen(
+                        product: widget.product,
+                      ),
+                    ),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFEE2B5B),

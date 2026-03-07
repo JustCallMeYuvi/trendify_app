@@ -1,7 +1,8 @@
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:trendify/admin_order_tracking_screen.dart';
+import 'package:trendify/admin/admin_order_tracking_screen.dart';
 import 'package:trendify/app_colors.dart';
 
 class OrderItem extends StatelessWidget {
@@ -53,7 +54,7 @@ class OrderItem extends StatelessWidget {
               customerName: name,
               price: price,
               status: status,
-              imageUrl: imageUrl, 
+              imageUrl: imageUrl,
             ),
           ),
         );
@@ -67,14 +68,30 @@ class OrderItem extends StatelessWidget {
         ),
         child: Row(
           children: [
+            // ClipRRect(
+            //   borderRadius: BorderRadius.circular(12),
+            //   child: Image.network(
+            //     imageUrl,
+            //     width: 48,
+            //     height: 48,
+            //     fit: BoxFit.cover,
+            //   ),
+            // ),
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                imageUrl,
-                width: 48,
-                height: 48,
-                fit: BoxFit.cover,
-              ),
+              child: imageUrl.startsWith("http")
+                  ? Image.network(
+                      imageUrl,
+                      width: 48,
+                      height: 48,
+                      fit: BoxFit.cover,
+                    )
+                  : Image.memory(
+                      base64Decode(imageUrl),
+                      width: 48,
+                      height: 48,
+                      fit: BoxFit.cover,
+                    ),
             ),
             const SizedBox(width: 16),
             Expanded(

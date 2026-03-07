@@ -4,7 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:trendify/add_new_product_screen.dart';
 import 'package:trendify/admin/admin_dash_board_container.dart';
-import 'package:trendify/admin_insights_dashboard_screen.dart';
+import 'package:trendify/admin/admin_insights_dashboard_screen.dart';
+import 'package:trendify/customer/main_customer_bottom_nav_bar.dart';
 import 'package:trendify/customer_explore_trends_screen.dart';
 import 'package:trendify/login_screen.dart';
 
@@ -36,10 +37,12 @@ class TrendifyApp extends StatelessWidget {
 
     if (isLoggedIn) {
       if (role == "admin") {
-        homeScreen = const AdminDashboardScreen();
-        // homeScreen = const AdminDashboardContainer();
+        // homeScreen = const AdminDashboardScreen();
+        homeScreen = const AdminDashboardContainer();
       } else {
-        homeScreen = const CustomerExploreTrendsScreen();
+        // homeScreen = const CustomerExploreTrendsScreen();
+        homeScreen = const CustomerMainNavigationScreen();
+        
       }
     } else {
       homeScreen = const LoginScreen();

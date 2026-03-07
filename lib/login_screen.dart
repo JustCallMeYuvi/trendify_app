@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:trendify/admin_insights_dashboard_screen.dart';
+import 'package:trendify/admin/admin_dash_board_container.dart';
+import 'package:trendify/admin/admin_insights_dashboard_screen.dart';
+import 'package:trendify/customer/main_customer_bottom_nav_bar.dart';
 import 'package:trendify/customer_explore_trends_screen.dart';
 import 'package:trendify/signup_screen.dart';
 
@@ -55,12 +57,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 16.0),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          IconButton(
-                            icon: const Icon(LucideIcons.chevronLeft, size: 28),
-                            onPressed: () => Navigator.pop(context),
-                          ),
+                          // IconButton(
+                          //   icon: const Icon(LucideIcons.chevronLeft, size: 28),
+                          //   onPressed: () => Navigator.pop(context),
+                          // ),
                           Text(
                             'TRENDIFY',
                             style: GoogleFonts.poppins(
@@ -334,9 +336,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
       String role = userDoc['role'];
 
- /// 🔥 Store login credentials locally
-      SharedPreferences prefs =
-          await SharedPreferences.getInstance();
+      /// 🔥 Store login credentials locally
+      SharedPreferences prefs = await SharedPreferences.getInstance();
 
       await prefs.setBool("isLoggedIn", true);
       await prefs.setString("role", role);
@@ -347,14 +348,16 @@ class _LoginScreenState extends State<LoginScreen> {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (_) => const AdminDashboardScreen(),
+            // builder: (_) => const AdminDashboardScreen(),
+            builder: (_) => const AdminDashboardContainer(),
           ),
         );
       } else {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (_) => const CustomerExploreTrendsScreen(),
+            // builder: (_) => const CustomerExploreTrendsScreen(),
+            builder: (_) => const CustomerMainNavigationScreen(),
           ),
         );
       }

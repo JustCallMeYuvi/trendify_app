@@ -169,35 +169,35 @@ class _AdminSettingsPageState extends State<AdminSettingsPage> {
           ],
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: Container(
-        margin: const EdgeInsets.only(top: 20),
-        child: FloatingActionButton(
-          onPressed: () {},
-          backgroundColor: const Color(0xFFEE2B5B),
-          elevation: 8,
-          shape: const CircleBorder(),
-          child: const Icon(Icons.add, color: Colors.white, size: 32),
-        ),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        height: 85,
-        notchMargin: 12,
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        shape: const CircularNotchedRectangle(),
-        color: Colors.white,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            const NavItem(icon: Icons.dashboard_outlined, label: 'Home'),
-            const NavItem(icon: Icons.local_shipping_outlined, label: 'Orders'),
-            const SizedBox(width: 48), // Space for FAB
-            const NavItem(icon: Icons.inventory_2_outlined, label: 'Inventory'),
-            const NavItem(
-                icon: Icons.settings, label: 'Settings', isActive: true),
-          ],
-        ),
-      ),
+      // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      // floatingActionButton: Container(
+      //   margin: const EdgeInsets.only(top: 20),
+      //   child: FloatingActionButton(
+      //     onPressed: () {},
+      //     backgroundColor: const Color(0xFFEE2B5B),
+      //     elevation: 8,
+      //     shape: const CircleBorder(),
+      //     child: const Icon(Icons.add, color: Colors.white, size: 32),
+      //   ),
+      // ),
+      // bottomNavigationBar: BottomAppBar(
+      //   height: 85,
+      //   notchMargin: 12,
+      //   padding: const EdgeInsets.symmetric(horizontal: 10),
+      //   shape: const CircularNotchedRectangle(),
+      //   color: Colors.white,
+      //   child: Row(
+      //     mainAxisAlignment: MainAxisAlignment.spaceAround,
+      //     children: [
+      //       const NavItem(icon: Icons.dashboard_outlined, label: 'Home'),
+      //       const NavItem(icon: Icons.local_shipping_outlined, label: 'Orders'),
+      //       const SizedBox(width: 48), // Space for FAB
+      //       const NavItem(icon: Icons.inventory_2_outlined, label: 'Inventory'),
+      //       const NavItem(
+      //           icon: Icons.settings, label: 'Settings', isActive: true),
+      //     ],
+      //   ),
+      // ),
     );
   }
 }

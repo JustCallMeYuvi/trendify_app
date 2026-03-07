@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -27,6 +29,13 @@ class _AdminOrderStatusScreenState extends State<AdminOrderStatusScreen> {
   // List<String> completedStatuses = ['Packed'];
   late String currentStatus;
   late List<String> completedStatuses;
+
+  List<Map<String, dynamic>> orderItems = [];
+  double subtotal = 0;
+  double shipping = 0;
+  double total = 0;
+  bool orderLoading = true;
+
   @override
   void initState() {
     super.initState();
@@ -90,7 +99,7 @@ class _AdminOrderStatusScreenState extends State<AdminOrderStatusScreen> {
                     ),
                   );
                   return;
-                } 
+                }
 
                 /// Update UI
                 setState(() {
@@ -142,23 +151,82 @@ class _AdminOrderStatusScreenState extends State<AdminOrderStatusScreen> {
     'Delivered'
   ];
 
+  // Future<void> _loadOrderStatus() async {
+  //   final doc = await FirebaseFirestore.instance
+  //       .collection('orders')
+  //       .doc(widget.orderId)
+  //       .get();
+
+  //   if (doc.exists) {
+  //     final data = doc.data();
+  //     String status = data?['status'] ?? widget.status;
+
+  //     int index = statusFlow.indexOf(status);
+
+  //     setState(() {
+  //       currentStatus = status;
+  //       completedStatuses = statusFlow.sublist(0, index + 1);
+  //     });
+  //   }
+  // }
+
   Future<void> _loadOrderStatus() async {
     final doc = await FirebaseFirestore.instance
         .collection('orders')
         .doc(widget.orderId)
         .get();
 
-    if (doc.exists) {
-      final data = doc.data();
-      String status = data?['status'] ?? widget.status;
+    if (!doc.exists) return;
 
-      int index = statusFlow.indexOf(status);
+    final data = doc.data() ?? {};
 
-      setState(() {
-        currentStatus = status;
-        completedStatuses = statusFlow.sublist(0, index + 1);
-      });
+    String status = data['status'] ?? widget.status;
+    int index = statusFlow.indexOf(status);
+
+    //
+    // List items = data['items'] ?? [];
+
+    // double sub = 0;
+
+    // for (var item in items) {
+    //   sub += ((item['price'] ?? 0) * (item['qty'] ?? 1));
+    // }
+
+    List items = data['items'] ?? [];
+
+    double sub = 0;
+
+    if (items.isNotEmpty) {
+      for (var item in items) {
+        sub += ((item['price'] ?? 0) * (item['qty'] ?? 1));
+      }
+    } else {
+      // fallback for single-product orders
+      items = [
+        {
+          "name": data['productName'],
+          "price": data['price'],
+          "qty": 1,
+          "size": "",
+          "color": "",
+          "imageUrl": data['productImage']
+        }
+      ];
+
+      sub = (data['price'] ?? 0).toDouble();
     }
+    setState(() {
+      currentStatus = status;
+      completedStatuses = statusFlow.sublist(0, index + 1);
+
+      orderItems = List<Map<String, dynamic>>.from(items);
+
+      subtotal = sub;
+      shipping = (data['shipping'] ?? 0).toDouble();
+      total = subtotal + shipping;
+
+      orderLoading = false;
+    });
   }
 
   @override
@@ -345,7 +413,7 @@ class _AdminOrderStatusScreenState extends State<AdminOrderStatusScreen> {
           crossAxisCount: 2,
           mainAxisSpacing: 16,
           crossAxisSpacing: 16,
-          childAspectRatio: 1.1,
+          childAspectRatio: 1.4,
           children: [
             _buildStatusBtn('Packed', Icons.inventory_2, 'COMPLETED'),
             _buildStatusBtn('Shipped', Icons.local_shipping, 'PENDING'),
@@ -436,7 +504,65 @@ class _AdminOrderStatusScreenState extends State<AdminOrderStatusScreen> {
     );
   }
 
+  // Widget _buildOrderSummary() {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       const Text(
+  //         'Order Summary',
+  //         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+  //       ),
+  //       const SizedBox(height: 16),
+  //       Container(
+  //         decoration: BoxDecoration(
+  //           color: Colors.white,
+  //           borderRadius: BorderRadius.circular(32),
+  //         ),
+  //         child: Column(
+  //           children: [
+  //             _buildOrderItem('Floral Midi Dress', 'M', 'Pastel Pink', 89.00),
+  //             const Divider(height: 1, color: Color(0xFFF8F9FB)),
+  //             _buildOrderItem('Classic Silk Scarf', 'One Size', 'Cream', 35.00),
+  //             Container(
+  //               padding: const EdgeInsets.all(24),
+  //               decoration: BoxDecoration(
+  //                 color: const Color(0xFFF8F9FB).withOpacity(0.5),
+  //                 borderRadius:
+  //                     const BorderRadius.vertical(bottom: Radius.circular(32)),
+  //               ),
+  //               child: Column(
+  //                 children: [
+  //                   _buildSummaryRow('Subtotal', '\$124.00'),
+  //                   const SizedBox(height: 8),
+  //                   _buildSummaryRow('Shipping', '\$12.00'),
+  //                   const Padding(
+  //                     padding: EdgeInsets.symmetric(vertical: 12),
+  //                     child: Divider(color: Color(0xFFE0E0E0)),
+  //                   ),
+  //                   const Row(
+  //                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                     children: [
+  //                       Text('Total Amount',
+  //                           style: TextStyle(fontWeight: FontWeight.bold)),
+  //                       Text('\$136.00',
+  //                           style: TextStyle(
+  //                               fontWeight: FontWeight.bold, fontSize: 20)),
+  //                     ],
+  //                   ),
+  //                 ],
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
   Widget _buildOrderSummary() {
+    if (orderLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -452,9 +578,24 @@ class _AdminOrderStatusScreenState extends State<AdminOrderStatusScreen> {
           ),
           child: Column(
             children: [
-              _buildOrderItem('Floral Midi Dress', 'M', 'Pastel Pink', 89.00),
-              const Divider(height: 1, color: Color(0xFFF8F9FB)),
-              _buildOrderItem('Classic Silk Scarf', 'One Size', 'Cream', 35.00),
+              /// 🔥 ORDER ITEMS (dynamic but same UI)
+              ...orderItems.map((item) {
+                return Column(
+                  children: [
+                    _buildOrderItem(
+                      item['name'] ?? '',
+                      item['size'] ?? '',
+                      item['color'] ?? '',
+                      (item['price'] ?? 0).toDouble(),
+                      item['qty'] ?? 1,
+                      item['imageUrl'] ?? '',
+                    ),
+                    const Divider(height: 1, color: Color(0xFFF8F9FB)),
+                  ],
+                );
+              }).toList(),
+
+              /// 🔥 TOTAL SECTION (same UI as original)
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
@@ -464,21 +605,29 @@ class _AdminOrderStatusScreenState extends State<AdminOrderStatusScreen> {
                 ),
                 child: Column(
                   children: [
-                    _buildSummaryRow('Subtotal', '\$124.00'),
+                    _buildSummaryRow(
+                        'Subtotal', '\$${subtotal.toStringAsFixed(2)}'),
                     const SizedBox(height: 8),
-                    _buildSummaryRow('Shipping', '\$12.00'),
+                    _buildSummaryRow(
+                        'Shipping', '\$${shipping.toStringAsFixed(2)}'),
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 12),
                       child: Divider(color: Color(0xFFE0E0E0)),
                     ),
-                    const Row(
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Total Amount',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        Text('\$136.00',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 20)),
+                        const Text(
+                          'Total Amount',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          '\$${total.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -490,44 +639,107 @@ class _AdminOrderStatusScreenState extends State<AdminOrderStatusScreen> {
       ],
     );
   }
+  // Widget _buildOrderItem(String name, String size, String color, double price) {
+  //   return Padding(
+  //     padding: const EdgeInsets.all(20),
+  //     child: Row(
+  //       children: [
+  //         Container(
+  //           width: 60,
+  //           height: 80,
+  //           decoration: BoxDecoration(
+  //             color: const Color(0xFFF8F9FB),
+  //             borderRadius: BorderRadius.circular(16),
+  //           ),
+  //           child: const Icon(Icons.image, color: Colors.grey),
+  //         ),
+  //         const SizedBox(width: 16),
+  //         Expanded(
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               Text(name,
+  //                   style: const TextStyle(
+  //                       fontWeight: FontWeight.bold, fontSize: 14)),
+  //               Text('Size: $size | Color: $color',
+  //                   style: const TextStyle(color: Colors.grey, fontSize: 12)),
+  //               const SizedBox(height: 8),
+  //               Row(
+  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                 children: [
+  //                   Text('\$${price.toStringAsFixed(2)}',
+  //                       style: const TextStyle(
+  //                           color: Color(0xFFEE2B5B),
+  //                           fontWeight: FontWeight.bold)),
+  //                   const Text('Qty: 01',
+  //                       style: TextStyle(
+  //                           color: Colors.grey,
+  //                           fontWeight: FontWeight.bold,
+  //                           fontSize: 10)),
+  //                 ],
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
-  Widget _buildOrderItem(String name, String size, String color, double price) {
+  Widget _buildOrderItem(
+    String name,
+    String size,
+    String color,
+    double price,
+    int qty,
+    String imageUrl,
+  ) {
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Row(
         children: [
-          Container(
-            width: 60,
-            height: 80,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF8F9FB),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: const Icon(Icons.image, color: Colors.grey),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: imageUrl.isNotEmpty
+                ? Image.memory(
+                    base64Decode(imageUrl),
+                    width: 60,
+                    height: 80,
+                    fit: BoxFit.cover,
+                  )
+                : const Icon(Icons.image, size: 40),
           ),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 14)),
-                Text('Size: $size | Color: $color',
-                    style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                Text(
+                  name,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+                Text(
+                  'Size: $size | Color: $color',
+                  style: const TextStyle(color: Colors.grey, fontSize: 12),
+                ),
                 const SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('\$${price.toStringAsFixed(2)}',
-                        style: const TextStyle(
-                            color: Color(0xFFEE2B5B),
-                            fontWeight: FontWeight.bold)),
-                    const Text('Qty: 01',
-                        style: TextStyle(
-                            color: Colors.grey,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 10)),
+                    Text(
+                      '\$${price.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                          color: Color(0xFFEE2B5B),
+                          fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      'Qty: $qty',
+                      style: const TextStyle(
+                          color: Colors.grey,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 10),
+                    ),
                   ],
                 ),
               ],
