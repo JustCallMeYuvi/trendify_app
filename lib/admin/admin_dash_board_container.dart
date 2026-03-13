@@ -4,6 +4,7 @@ import 'package:trendify/add_new_product_screen.dart';
 import 'package:trendify/admin/admin_settings_screen.dart';
 import 'package:trendify/admin/admin_insights_dashboard_screen.dart';
 import 'package:trendify/admin/admin_order_management_screen.dart';
+import 'package:trendify/admin/user_management.dart';
 
 class AdminDashboardContainer extends StatefulWidget {
   const AdminDashboardContainer({super.key});
@@ -18,7 +19,7 @@ class _AdminDashboardContainerState extends State<AdminDashboardContainer> {
 
   final List<Widget> pages = const [
     AdminDashboardScreen(),
-    AdminDashboardScreen(),
+    UserManagementScreen(),
 
     // AdminPerformanceChartScreen(),
     ManageOrdersScreen(),
@@ -32,9 +33,7 @@ class _AdminDashboardContainerState extends State<AdminDashboardContainer> {
         index: _selectedIndex,
         children: pages,
       ),
-
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-
       floatingActionButton: SizedBox(
         height: 64,
         width: 64,
@@ -55,7 +54,6 @@ class _AdminDashboardContainerState extends State<AdminDashboardContainer> {
           child: const Icon(Icons.add, color: Colors.white, size: 32),
         ),
       ),
-
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
         notchMargin: 8,
@@ -66,11 +64,9 @@ class _AdminDashboardContainerState extends State<AdminDashboardContainer> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             _buildNavItem(0, Icons.dashboard_outlined, 'Dashboard'),
-            _buildNavItem(1, Icons.bar_chart_outlined, 'Analytics'),
-
-            const SizedBox(width: 40),
-
             _buildNavItem(2, Icons.inventory_2_outlined, 'Orders'),
+            const SizedBox(width: 40),
+            _buildNavItem(1, Icons.groups, 'Users'),
             _buildNavItem(3, Icons.settings_outlined, 'Settings'),
           ],
         ),
