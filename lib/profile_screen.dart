@@ -12,10 +12,9 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-    final user = FirebaseAuth.instance.currentUser;
+  final user = FirebaseAuth.instance.currentUser;
   @override
   Widget build(BuildContext context) {
-
     /// 🔴 If user not logged in
     if (user == null) {
       return const Scaffold(
